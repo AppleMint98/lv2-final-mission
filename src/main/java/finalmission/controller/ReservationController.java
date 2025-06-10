@@ -1,5 +1,6 @@
 package finalmission.controller;
 
+import finalmission.dto.ReservationCreateRequest;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
 import finalmission.dto.ReservationUpdateRequest;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +33,13 @@ public class ReservationController {
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationDetailResponse> findReservationDetail(@PathVariable("reservationId") Long reservationId) {
         ReservationDetailResponse response = reservationService.findMemberReservationDetail(reservationId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{memberId}")
+    public ResponseEntity<ReservationResponse> createReservation(@PathVariable("memberId") Long memberId,
+                                                                 @RequestBody ReservationCreateRequest request) {
+        ReservationResponse response = reservationService.createMemberReservation(memberId, request);
         return ResponseEntity.ok(response);
     }
 

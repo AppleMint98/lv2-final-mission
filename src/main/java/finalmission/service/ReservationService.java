@@ -1,10 +1,17 @@
 package finalmission.service;
 
+import finalmission.domain.entity.Manager;
+import finalmission.domain.entity.Member;
 import finalmission.domain.entity.Reservation;
+import finalmission.domain.entity.Tour;
+import finalmission.dto.ReservationCreateRequest;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
 import finalmission.dto.ReservationUpdateRequest;
+import finalmission.repository.ManagerRepository;
+import finalmission.repository.MemberRepository;
 import finalmission.repository.ReservationRepository;
+import finalmission.repository.TourRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReservationService {
 
+    private final MemberRepository memberRepository;
+    private final ManagerRepository managerRepository;
+    private final TourRepository tourRepository;
     private final ReservationRepository reservationRepository;
 
     @Transactional(readOnly = true)
@@ -34,6 +44,25 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
         // TODO: 본인만 예약 상세내용 확인가능하도록 변경
         return ReservationDetailResponse.from(byId);
+    }
+
+    @Transactional
+    public ReservationResponse createMemberReservation(Long memberId, ReservationCreateRequest request) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        Manager manager = managerRepository.findById(request.managerId())
+                .orElseThrow(() -> new IllegalArgumentException("Manager not found"));
+        Tour tour = tourRepository.findById(request.tourId())
+                .orElseThrow(() -> new IllegalArgumentException("Tour not found"));
+
+        Reservation saved = reservationRepository.save(new Reservation(
+                member,
+                manager,
+                tour,
+                request.date(),
+                request.time()
+        ));
+        return ReservationResponse.from(saved);
     }
 
     @Transactional

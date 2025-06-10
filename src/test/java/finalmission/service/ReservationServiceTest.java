@@ -2,6 +2,7 @@ package finalmission.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -11,10 +12,14 @@ import finalmission.domain.entity.Member;
 import finalmission.domain.entity.Reservation;
 import finalmission.domain.entity.Tour;
 import finalmission.domain.vo.MemberRole;
+import finalmission.dto.ReservationCreateRequest;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
 import finalmission.dto.ReservationUpdateRequest;
+import finalmission.repository.ManagerRepository;
+import finalmission.repository.MemberRepository;
 import finalmission.repository.ReservationRepository;
+import finalmission.repository.TourRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,6 +34,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
+    @Mock
+    MemberRepository memberRepository;
+    @Mock
+    ManagerRepository managerRepository;
+    @Mock
+    TourRepository tourRepository;
     @Mock
     ReservationRepository reservationRepository;
     @InjectMocks
@@ -70,8 +81,76 @@ class ReservationServiceTest {
 
         // when // then
         assertThatThrownBy(() -> reservationService.findMemberReservationDetail(2L))
-                        .isInstanceOf(IllegalArgumentException.class)
-                        .hasMessageContaining("Reservation not found");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Reservation not found");
+    }
+
+    @DisplayName("조회된 멤버가 없을 경우 예외를 발생한다.")
+    @Test
+    void throwErrorWhenMemberNotFoundTest() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(Optional.empty());
+
+        // when // then
+        assertThatThrownBy(() -> reservationService.createMemberReservation(2L,
+                new ReservationCreateRequest(1L, 1L, LocalDate.now(), LocalTime.now())))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Member not found");
+    }
+
+    @DisplayName("조회된 담당자가 없을 경우 예외를 발생한다.")
+    @Test
+    void throwErrorWhenManagerNotFoundTest() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(
+                Optional.of(new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER)));
+        when(managerRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when // then
+        assertThatThrownBy(() -> reservationService.createMemberReservation(2L,
+                new ReservationCreateRequest(1L, 1L, LocalDate.now(), LocalTime.now())))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Manager not found");
+    }
+
+    @DisplayName("조회된 투어가 없을 경우 예외를 발생한다.")
+    @Test
+    void throwErrorWhenTourNotFoundTest() {
+        // given
+        when(memberRepository.findById(2L)).thenReturn(
+                Optional.of(new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER)));
+        when(managerRepository.findById(1L)).thenReturn(Optional.of(new Manager(1L, "Peter", "010-1234-5678")));
+        when(tourRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // when // then
+        assertThatThrownBy(() -> reservationService.createMemberReservation(2L,
+                new ReservationCreateRequest(1L, 1L, LocalDate.now(), LocalTime.now())))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Tour not found");
+    }
+
+    @Test
+    void createMemberReservationTest() {
+        // given
+        when(memberRepository.findById(1L)).thenReturn(
+                Optional.of(new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER)));
+        when(managerRepository.findById(1L)).thenReturn(Optional.of(new Manager(1L, "Peter", "010-1234-5678")));
+        when(tourRepository.findById(1L)).thenReturn(Optional.of(new Tour(1L, "Peter", "010-1234-5678")));
+        when(reservationRepository.save(any())).thenReturn(new Reservation(1L,
+                new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER),
+                new Manager(1L, "Peter", "010-1234-5678"),
+                new Tour(1L, "Peter", "010-1234-5678"),
+                LocalDate.now(),
+                LocalTime.now()
+        ));
+
+        // when
+        ReservationResponse response = reservationService.createMemberReservation(1L,
+                new ReservationCreateRequest(1L, 1L, LocalDate.now(), LocalTime.now()));
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response).isInstanceOf(ReservationResponse.class);
     }
 
     @Test

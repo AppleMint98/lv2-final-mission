@@ -45,6 +45,11 @@ public class Reservation {
         this.time = time;
     }
 
+    public Reservation(final Member member, final Manager manager, final Tour tour, final LocalDate date,
+                       final LocalTime time) {
+        this(null, member, manager, tour, date, time);
+    }
+
     public Reservation updateReservation(ReservationUpdateRequest request) {
         // TODO: 수정사항 선택하기
         return this;
