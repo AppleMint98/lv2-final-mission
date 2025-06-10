@@ -26,4 +26,8 @@ public class Tour {
         this.title = title;
         this.description = description;
     }
+
+    public Tour(final String title, final String description) {
+        this(null, title, description);
+    }
 }
