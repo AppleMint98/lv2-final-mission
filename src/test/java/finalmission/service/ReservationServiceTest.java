@@ -1,6 +1,7 @@
 package finalmission.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import finalmission.domain.entity.Manager;
@@ -8,11 +9,14 @@ import finalmission.domain.entity.Member;
 import finalmission.domain.entity.Reservation;
 import finalmission.domain.entity.Tour;
 import finalmission.domain.vo.MemberRole;
+import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
 import finalmission.repository.ReservationRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -39,6 +43,32 @@ class ReservationServiceTest {
 
         // then
         assertThat(responses.size()).isEqualTo(2);
+    }
+
+    @Test
+    void findMemberReservationDetailTest() {
+        // given
+        Reservation reservation = createReservationByReservationIdAndMemberId(1L, 1L);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+
+        // when
+        ReservationDetailResponse response = reservationService.findMemberReservationDetail(1L);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response).isInstanceOf(ReservationDetailResponse.class);
+    }
+
+    @DisplayName("조회된 예약이 없을 경우 예외를 발생한다.")
+    @Test
+    void throwErrorWhenReservationNotFoundTest() {
+        // given
+        when(reservationRepository.findById(2L)).thenReturn(Optional.empty());
+
+        // when // then
+        assertThatThrownBy(() -> reservationService.findMemberReservationDetail(2L))
+                        .isInstanceOf(IllegalArgumentException.class)
+                        .hasMessageContaining("Reservation not found");
     }
 
     private Reservation createReservationByReservationIdAndMemberId(Long reservationId, Long memberId) {

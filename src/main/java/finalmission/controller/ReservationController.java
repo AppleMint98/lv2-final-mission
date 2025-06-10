@@ -1,5 +1,6 @@
 package finalmission.controller;
 
+import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
 import finalmission.service.ReservationService;
 import java.util.List;
@@ -20,6 +21,12 @@ public class ReservationController {
     @GetMapping("/{memberId}")
     public ResponseEntity<List<ReservationResponse>> findAllByMemberId(@PathVariable("memberId") Long memberId) {
         List<ReservationResponse> response = reservationService.findAllMemberReservations(memberId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{reservationId}")
+    public ResponseEntity<ReservationDetailResponse> findReservationDetail(@PathVariable("reservationId") Long reservationId) {
+        ReservationDetailResponse response = reservationService.findMemberReservationDetail(reservationId);
         return ResponseEntity.ok(response);
     }
 }

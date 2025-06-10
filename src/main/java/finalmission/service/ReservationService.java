@@ -1,6 +1,7 @@
 package finalmission.service;
 
 import finalmission.domain.entity.Reservation;
+import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
 import finalmission.repository.ReservationRepository;
 import java.util.ArrayList;
@@ -24,5 +25,13 @@ public class ReservationService {
             responses.add(ReservationResponse.from(reservation));
         }
         return responses;
+    }
+
+    @Transactional(readOnly = true)
+    public ReservationDetailResponse findMemberReservationDetail(Long reservationId) {
+        Reservation byId = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        // TODO: 본인만 예약 상세내용 확인가능하도록 변경
+        return ReservationDetailResponse.from(byId);
     }
 }
