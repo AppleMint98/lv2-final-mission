@@ -2,6 +2,8 @@ package finalmission.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import finalmission.domain.entity.Manager;
@@ -11,6 +13,7 @@ import finalmission.domain.entity.Tour;
 import finalmission.domain.vo.MemberRole;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
+import finalmission.dto.ReservationUpdateRequest;
 import finalmission.repository.ReservationRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -69,6 +72,30 @@ class ReservationServiceTest {
         assertThatThrownBy(() -> reservationService.findMemberReservationDetail(2L))
                         .isInstanceOf(IllegalArgumentException.class)
                         .hasMessageContaining("Reservation not found");
+    }
+
+    @Test
+    void updateMemberReservationTest() {
+        // given
+        Reservation reservation = createReservationByReservationIdAndMemberId(1L, 1L);
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+
+        // when
+        ReservationResponse response = reservationService.updateMemberReservation(1L,
+                new ReservationUpdateRequest("member2@email.com"));
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response).isInstanceOf(ReservationResponse.class);
+    }
+
+    @Test
+    void deleteMemberReservationTest() {
+        // when
+        reservationService.deleteMemberReservation(1L);
+
+        // then
+        verify(reservationRepository, atLeastOnce()).deleteById(1L);
     }
 
     private Reservation createReservationByReservationIdAndMemberId(Long reservationId, Long memberId) {

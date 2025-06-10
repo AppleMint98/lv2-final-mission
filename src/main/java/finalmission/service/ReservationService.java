@@ -3,6 +3,7 @@ package finalmission.service;
 import finalmission.domain.entity.Reservation;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
+import finalmission.dto.ReservationUpdateRequest;
 import finalmission.repository.ReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,5 +34,18 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
         // TODO: 본인만 예약 상세내용 확인가능하도록 변경
         return ReservationDetailResponse.from(byId);
+    }
+
+    @Transactional
+    public ReservationResponse updateMemberReservation(Long reservationId, ReservationUpdateRequest request) {
+        Reservation byId = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+        Reservation updated = byId.updateReservation(request);
+        return ReservationResponse.from(updated);
+    }
+
+    @Transactional
+    public void deleteMemberReservation(Long reservationId) {
+        reservationRepository.deleteById(reservationId);
     }
 }

@@ -1,5 +1,6 @@
 package finalmission.domain.entity;
 
+import finalmission.dto.ReservationUpdateRequest;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -42,5 +43,10 @@ public class Reservation {
         this.tour = tour;
         this.date = date;
         this.time = time;
+    }
+
+    public Reservation updateReservation(ReservationUpdateRequest request) {
+        // TODO: 수정사항 선택하기
+        return this;
     }
 }
