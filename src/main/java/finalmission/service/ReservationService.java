@@ -1,9 +1,11 @@
 package finalmission.service;
 
+import finalmission.common.client.EmailClient;
 import finalmission.domain.entity.Manager;
 import finalmission.domain.entity.Member;
 import finalmission.domain.entity.Reservation;
 import finalmission.domain.entity.Tour;
+import finalmission.dto.EmailRequest;
 import finalmission.dto.ReservationCreateRequest;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
@@ -27,6 +29,7 @@ public class ReservationService {
     private final ManagerRepository managerRepository;
     private final TourRepository tourRepository;
     private final ReservationRepository reservationRepository;
+    private final EmailClient emailClient;
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findAllMemberReservations(Long memberId) {
@@ -62,6 +65,9 @@ public class ReservationService {
                 request.date(),
                 request.time()
         ));
+
+        // emailClient.sendSuccessEmail(new EmailRequest(member.getEmail())); // FIXME: 주석해제
+
         return ReservationResponse.from(saved);
     }
 
