@@ -20,4 +20,10 @@ public class Tour {
     private String title;
 
     private String description;
+
+    public Tour(final Long id, final String title, final String description) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+    }
 }

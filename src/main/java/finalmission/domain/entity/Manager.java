@@ -20,4 +20,10 @@ public class Manager {
     private String name;
 
     private String phoneNumber;
+
+    public Manager(final Long id, final String name, final String phoneNumber) {
+        this.id = id;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+    }
 }

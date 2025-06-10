@@ -23,4 +23,11 @@ public class Member {
     private String password;
 
     private MemberRole role;
+
+    public Member(final Long id, final String email, final String password, final MemberRole role) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
 }

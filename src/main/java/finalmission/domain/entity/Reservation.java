@@ -33,4 +33,14 @@ public class Reservation {
     private LocalDate date;
 
     private LocalTime time;
+
+    public Reservation(final Long id, final Member member, final Manager manager, final Tour tour, final LocalDate date,
+                       final LocalTime time) {
+        this.id = id;
+        this.member = member;
+        this.manager = manager;
+        this.tour = tour;
+        this.date = date;
+        this.time = time;
+    }
 }
