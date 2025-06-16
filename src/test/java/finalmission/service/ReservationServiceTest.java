@@ -7,6 +7,7 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import finalmission.common.client.PublicHolidayClient;
 import finalmission.domain.entity.Manager;
 import finalmission.domain.entity.Member;
 import finalmission.domain.entity.Reservation;
@@ -42,6 +43,8 @@ class ReservationServiceTest {
     TourRepository tourRepository;
     @Mock
     ReservationRepository reservationRepository;
+    @Mock
+    PublicHolidayClient publicHolidayClient;
     @InjectMocks
     ReservationService reservationService;
 
