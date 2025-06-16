@@ -11,12 +11,19 @@ public class ClientConfig {
     @Value("${email.secret.key}")
     private String emailApiKey;
 
+//    @Bean
+//    public RestClient emailRestClient() {
+//        return RestClient.builder()
+//                .baseUrl("https://api.sendgrid.com")
+//                .defaultHeader("Content-Type", "application/json")
+//                .defaultHeader("Authorization", "Bearer " + emailApiKey)
+//                .build();
+//    }
+
     @Bean
-    public RestClient emailRestClient() {
+    public RestClient publicHolidayRestClient() {
         return RestClient.builder()
-                .baseUrl("https://api.sendgrid.com")
-                .defaultHeader("Content-Type", "application/json")
-                .defaultHeader("Authorization", "Bearer " + emailApiKey)
+                .baseUrl("https://apis.data.go.kr")
                 .build();
     }
 }
