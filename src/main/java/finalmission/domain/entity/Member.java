@@ -18,13 +18,15 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String name;
+
     private String email;
 
     private String password;
 
     private MemberRole role;
 
-    public Member(final Long id, final String email, final String password, final MemberRole role) {
+    public Member(final Long id, final String name, final String email, final String password, final MemberRole role) {
         this.id = id;
         this.email = email;
         this.password = password;

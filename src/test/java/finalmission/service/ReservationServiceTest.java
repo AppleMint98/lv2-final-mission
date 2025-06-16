@@ -103,7 +103,7 @@ class ReservationServiceTest {
     void throwErrorWhenManagerNotFoundTest() {
         // given
         when(memberRepository.findById(2L)).thenReturn(
-                Optional.of(new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER)));
+                Optional.of(new Member(1L, "member", "member@email.com", "Password123!@#", MemberRole.USER)));
         when(managerRepository.findById(1L)).thenReturn(Optional.empty());
 
         // when // then
@@ -118,7 +118,7 @@ class ReservationServiceTest {
     void throwErrorWhenTourNotFoundTest() {
         // given
         when(memberRepository.findById(2L)).thenReturn(
-                Optional.of(new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER)));
+                Optional.of(new Member(1L, "member", "member@email.com", "Password123!@#", MemberRole.USER)));
         when(managerRepository.findById(1L)).thenReturn(Optional.of(new Manager(1L, "Peter", "010-1234-5678")));
         when(tourRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -133,11 +133,11 @@ class ReservationServiceTest {
     void createMemberReservationTest() {
         // given
         when(memberRepository.findById(1L)).thenReturn(
-                Optional.of(new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER)));
+                Optional.of(new Member(1L, "member", "member@email.com", "Password123!@#", MemberRole.USER)));
         when(managerRepository.findById(1L)).thenReturn(Optional.of(new Manager(1L, "Peter", "010-1234-5678")));
         when(tourRepository.findById(1L)).thenReturn(Optional.of(new Tour(1L, "Peter", "010-1234-5678")));
         when(reservationRepository.save(any())).thenReturn(new Reservation(1L,
-                new Member(1L, "member@email.com", "Password123!@#", MemberRole.USER),
+                new Member(1L, "member", "member@email.com", "Password123!@#", MemberRole.USER),
                 new Manager(1L, "Peter", "010-1234-5678"),
                 new Tour(1L, "Peter", "010-1234-5678"),
                 LocalDate.now(),
@@ -180,7 +180,7 @@ class ReservationServiceTest {
     private Reservation createReservationByReservationIdAndMemberId(Long reservationId, Long memberId) {
         return new Reservation(
                 reservationId,
-                new Member(memberId, "member1@email.com", "Password123!@#", MemberRole.USER),
+                new Member(memberId, "member", "member1@email.com", "Password123!@#", MemberRole.USER),
                 new Manager(1L, "Peter", "010-1234-5678"),
                 new Tour(1L, "title", "description"),
                 LocalDate.of(2025, 6, 10),
