@@ -26,4 +26,8 @@ public class Manager {
         this.name = name;
         this.phoneNumber = phoneNumber;
     }
+
+    public Manager(final String name, final String phoneNumber) {
+        this(null, name, phoneNumber);
+    }
 }
