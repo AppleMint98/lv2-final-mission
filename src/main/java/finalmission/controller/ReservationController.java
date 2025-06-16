@@ -1,5 +1,6 @@
 package finalmission.controller;
 
+import finalmission.auth.Authenticated;
 import finalmission.dto.ReservationCreateRequest;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
@@ -24,22 +25,22 @@ public class ReservationController {
 
     private final ReservationService reservationService;
 
-    @GetMapping("/{memberId}")
-    public ResponseEntity<List<ReservationResponse>> findAllByMemberId(@PathVariable("memberId") Long memberId) {
+    @GetMapping
+    public ResponseEntity<List<ReservationResponse>> findAllByMemberId(@Authenticated Long memberId) {
         List<ReservationResponse> response = reservationService.findAllMemberReservations(memberId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping
+    public ResponseEntity<ReservationResponse> createReservation(@Authenticated Long memberId,
+                                                                 @RequestBody ReservationCreateRequest request) {
+        ReservationResponse response = reservationService.createMemberReservation(memberId, request);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{reservationId}")
     public ResponseEntity<ReservationDetailResponse> findReservationDetail(@PathVariable("reservationId") Long reservationId) {
         ReservationDetailResponse response = reservationService.findMemberReservationDetail(reservationId);
-        return ResponseEntity.ok(response);
-    }
-
-    @PostMapping("/{memberId}")
-    public ResponseEntity<ReservationResponse> createReservation(@PathVariable("memberId") Long memberId,
-                                                                 @RequestBody ReservationCreateRequest request) {
-        ReservationResponse response = reservationService.createMemberReservation(memberId, request);
         return ResponseEntity.ok(response);
     }
 

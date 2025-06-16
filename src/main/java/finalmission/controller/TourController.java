@@ -27,13 +27,13 @@ public class TourController {
         return ResponseEntity.ok(allTours);
     }
 
-    @PostMapping
+    @PostMapping("/agency")
     public ResponseEntity<TourResponse> createTour(@RequestBody TourCreateRequest request) {
         TourResponse saved = tourService.createTour(request);
         return ResponseEntity.ok(saved);
     }
 
-    @DeleteMapping("/{tourId}")
+    @DeleteMapping("/agency/{tourId}")
     public ResponseEntity<Void> removeTour(@PathVariable("tourId") Long tourId) {
         tourService.deleteTour(tourId);
         return ResponseEntity.noContent().build();
