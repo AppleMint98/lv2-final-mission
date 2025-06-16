@@ -28,6 +28,7 @@ public class Member {
 
     public Member(final Long id, final String name, final String email, final String password, final MemberRole role) {
         this.id = id;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
