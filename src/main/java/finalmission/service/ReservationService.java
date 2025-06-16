@@ -1,11 +1,10 @@
 package finalmission.service;
 
-import finalmission.common.client.EmailClient;
+import finalmission.common.client.PublicHolidayClient;
 import finalmission.domain.entity.Manager;
 import finalmission.domain.entity.Member;
 import finalmission.domain.entity.Reservation;
 import finalmission.domain.entity.Tour;
-import finalmission.dto.EmailRequest;
 import finalmission.dto.ReservationCreateRequest;
 import finalmission.dto.ReservationDetailResponse;
 import finalmission.dto.ReservationResponse;
@@ -29,7 +28,7 @@ public class ReservationService {
     private final ManagerRepository managerRepository;
     private final TourRepository tourRepository;
     private final ReservationRepository reservationRepository;
-    private final EmailClient emailClient;
+    private final PublicHolidayClient holidayClient;
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findAllMemberReservations(Long memberId) {
@@ -51,6 +50,9 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponse createMemberReservation(Long memberId, ReservationCreateRequest request) {
+        if (holidayClient.checkPublicHoliday(request.date())) {
+            throw new IllegalArgumentException("Public holiday is not available");
+        }
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("Member not found"));
         Manager manager = managerRepository.findById(request.managerId())
@@ -65,9 +67,6 @@ public class ReservationService {
                 request.date(),
                 request.time()
         ));
-
-        // emailClient.sendSuccessEmail(new EmailRequest(member.getEmail())); // FIXME: 주석해제
-
         return ReservationResponse.from(saved);
     }
 
