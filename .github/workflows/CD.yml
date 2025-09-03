@@ -58,7 +58,7 @@ jobs:
 
           # Start the new application
           echo "Starting application..."
-          nohup java -jar "$JAR_FILE" --spring.profiles.active=prod > app.log 2>&1 &
+          nohup java -jar "$JAR_FILE" > app.log 2>&1 &
 
           # Verify that the application has started
           sleep 15
