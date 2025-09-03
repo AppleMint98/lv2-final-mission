@@ -12,62 +12,19 @@ jobs:
     runs-on: self-hosted
 
     steps:
-      - name: Set up JDK 21 (Amazon Corretto)
-        uses: actions/setup-java@v4
-        with:
-          distribution: corretto
-          java-version: 21
-
-      - name: Download build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: application-jar
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          run-id: ${{ github.event.workflow_run.id }}
-
-      - name: Deploy application
+      - name: Deploy to Server
         run: |
-          set -euo pipefail
-          set -x  # 실행되는 명령어 추적
+          # Docker Hub에서 최신 이미지를 받아옵니다.
+          # 이미지는 public으로 가정합니다. private일 경우 docker login이 필요합니다.
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/jeffreyhong9821/final-mission:latest
 
-          JAR_FILE=$(find . -name "*.jar" | head -n 1)
+          # 기존에 실행 중인 컨테이너가 있다면 중지하고 삭제합니다.
+          # || true를 붙여서 컨테이너가 없는 첫 배포 시 에러가 나지 않도록 합니다.
+          docker stop my-app-container || true
+          docker rm my-app-container || true
 
-          if [ -z "$JAR_FILE" ]; then
-            echo "ERROR: JAR file not found."
-            exit 1
-          fi
-
-          echo "Deploying JAR file: $JAR_FILE"
-
-          # Find and stop the running application (if any)
-          PID=$(pgrep -f "$JAR_FILE" || true)
-          if [ -n "$PID" ]; then
-            echo "Stopping running application with PID: $PID"
-            kill -15 "$PID" || true
-            # Wait up to 10 seconds for process termination
-            for i in {1..10}; do
-              if ! ps -p "$PID" > /dev/null; then
-                echo "Application stopped successfully."
-                break
-              fi
-              sleep 1
-            done
-          else
-            echo "No running application found."
-          fi
-
-          # Start the new application
-          echo "Starting application..."
-          setsid nohup java -jar "$JAR_FILE" > app.log 2>&1 &
-          
-          # Verify that the application has started
-          sleep 15
-          NEW_PID=$(pgrep -f "$JAR_FILE" || true)
-          if [ -n "$NEW_PID" ]; then
-            echo "Application started successfully with PID: $NEW_PID"
-            echo "Check logs with: tail -f app.log"
-          else
-            echo "ERROR: Application failed to start. Check app.log for details."
-            cat app.log
-            exit 1
-          fi
+          # 새로운 컨테이너를 실행합니다.
+          # -d: 백그라운드 실행
+          # -p 8080:8080: 호스트의 8080 포트와 컨테이너의 8080 포트를 연결
+          # --name: 컨테이너에 고정된 이름을 부여하여 관리하기 쉽게 만듭니다.
+          docker run -d -p 8080:8080 --name my-app-container ${{ secrets.DOCKERHUB_USERNAME }}/your-repo-name:latest
