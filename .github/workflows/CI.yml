@@ -25,3 +25,9 @@ jobs:
 
       - name: 전체 빌드 및 테스트
         run: ./gradlew clean build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@4
+        with:
+          name: application-jar
+          path: build/libs/*.jar
