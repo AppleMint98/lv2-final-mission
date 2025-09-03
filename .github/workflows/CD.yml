@@ -12,6 +12,12 @@ jobs:
     runs-on: self-hosted
 
     steps:
+      - name: Set up JDK 21 (Amazon Corretto)
+        uses: actions/setup-java@v4
+        with:
+          distribution: corretto
+          java-version: 21
+
       - name: Download build artifact
         uses: actions/download-artifact@v4
         with:
