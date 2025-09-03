@@ -1,0 +1,63 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    types:
+      - completed
+
+jobs:
+  Continuous-Deployment:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: self-hosted
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: application-jar
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Deploy application
+        run: |
+          JAR_FILE=$(find . -name "*.jar" | head -n 1)
+
+          if [ -z "$JAR_FILE" ]; then
+            echo "ERROR: JAR file not found."
+            exit 1
+          fi
+
+          echo "Deploying JAR file: $JAR_FILE"
+
+          # Find and stop the running application based on the JAR file name
+          PID=$(pgrep -f "$JAR_FILE")
+          if [ -n "$PID" ]; then
+            echo "Stopping running application with PID: $PID"
+            kill -15 $PID
+            # Wait for the process to terminate
+            for i in {1..10}; do
+              if ! ps -p $PID > /dev/null; then
+                break
+              fi
+              sleep 1
+            done
+          else
+            echo "No running application found."
+          fi
+
+          # Start the new application
+          echo "Starting application..."
+          nohup java -jar $JAR_FILE --spring.profiles.active=prod > app.log 2>&1 &
+
+          # Verify that the application has started
+          sleep 15
+          NEW_PID=$(pgrep -f "$JAR_FILE")
+          if [ -n "$NEW_PID" ]; then
+            echo "Application started successfully with PID: $NEW_PID"
+            echo "Check logs with: tail -f app.log"
+          else
+            echo "ERROR: Application failed to start. Check app.log for details."
+            cat app.log
+            exit 1
+          fi
