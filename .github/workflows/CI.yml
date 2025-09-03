@@ -37,4 +37,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/jeffreyhong9821/final-mission:latest
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/final-mission:latest
