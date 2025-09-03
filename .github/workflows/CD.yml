@@ -21,6 +21,9 @@ jobs:
 
       - name: Deploy application
         run: |
+          set -euo pipefail
+          set -x  # 실행되는 명령어 추적
+
           JAR_FILE=$(find . -name "*.jar" | head -n 1)
 
           if [ -z "$JAR_FILE" ]; then
@@ -30,14 +33,15 @@ jobs:
 
           echo "Deploying JAR file: $JAR_FILE"
 
-          # Find and stop the running application based on the JAR file name
-          PID=$(pgrep -f "$JAR_FILE")
+          # Find and stop the running application (if any)
+          PID=$(pgrep -f "$JAR_FILE" || true)
           if [ -n "$PID" ]; then
             echo "Stopping running application with PID: $PID"
-            kill -15 $PID
-            # Wait for the process to terminate
+            kill -15 "$PID" || true
+            # Wait up to 10 seconds for process termination
             for i in {1..10}; do
-              if ! ps -p $PID > /dev/null; then
+              if ! ps -p "$PID" > /dev/null; then
+                echo "Application stopped successfully."
                 break
               fi
               sleep 1
@@ -48,11 +52,11 @@ jobs:
 
           # Start the new application
           echo "Starting application..."
-          nohup java -jar $JAR_FILE --spring.profiles.active=prod > app.log 2>&1 &
+          nohup java -jar "$JAR_FILE" --spring.profiles.active=prod > app.log 2>&1 &
 
           # Verify that the application has started
           sleep 15
-          NEW_PID=$(pgrep -f "$JAR_FILE")
+          NEW_PID=$(pgrep -f "$JAR_FILE" || true)
           if [ -n "$NEW_PID" ]; then
             echo "Application started successfully with PID: $NEW_PID"
             echo "Check logs with: tail -f app.log"
